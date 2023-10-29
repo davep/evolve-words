@@ -183,15 +183,15 @@ class EvolveWordsApp(App[None]):
     def compose(self) -> ComposeResult:
         """Compose the DOM of the app."""
         yield Header()
-        with Horizontal():
-            yield Button("Evolve!", id="evolve", disabled=True)
+        with Horizontal(id="io-bar", disabled=True):
+            yield Button("Evolve!", id="evolve")
             yield Rule(orientation="vertical")
             yield Label("Loading...", id="fitness-landscape")
             yield Rule(orientation="vertical")
-            yield Label("Loading...", id="progenitor")
-            yield Rule(orientation="vertical")
             yield Label("Target population size: ")
             yield IntInput("300")
+            yield Rule(orientation="vertical")
+            yield Label("Loading...", id="progenitor")
             yield Rule(orientation="vertical")
             yield Label("Generation: 0", id="generation")
         with VerticalScroll() as wrapper:
@@ -243,6 +243,7 @@ class EvolveWordsApp(App[None]):
     @on(Ready)
     def okay_to_go(self) -> None:
         """Set the application as ready to go."""
+        self.query_one("#io-bar").disabled = False
         self.query_one("#fitness-landscape", Label).update(
             f"Fitness landscape size: {len(self._words)} words"
         )
