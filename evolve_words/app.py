@@ -328,6 +328,10 @@ class EvolveWordsApp(App[None]):
             # Next population.
             generation += 1
 
+        # Get the user's attention to let them know we've completed the run.
+        self.notify(
+            f"Generated {len(set(population))} unique words in {generation} generations."
+        )
         self.bell()
 
 
