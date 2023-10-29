@@ -15,7 +15,7 @@ from string import ascii_lowercase
 # Textual imports.
 from textual import on, work
 from textual.app import App, ComposeResult
-from textual.containers import Horizontal
+from textual.containers import Horizontal, VerticalScroll
 from textual.message import Message
 from textual.widgets import Button, Header, Input, Label, Log, Rule, Static
 from textual.worker import get_current_worker
@@ -126,6 +126,12 @@ class Mutate:
         return choice((Mutate.point, Mutate.deletion, Mutate.insertion))(word)
 
 ##############################################################################
+class AppLog(Log):
+    """The log widget for the app."""
+
+    BORDER_TITLE = "Log"
+
+##############################################################################
 class EvolveWordsApp(App[None]):
     """An application that demonstrates evolution through mutation."""
 
@@ -142,10 +148,14 @@ class EvolveWordsApp(App[None]):
         content-align: left middle;
     }
 
-    #words {
+    VerticalScroll {
         border-top: panel cornflowerblue 70%;
         height: 2fr;
         background: $panel;
+    }
+
+    VerticalScroll:focus {
+        border-top: panel cornflowerblue;
     }
 
     Log {
@@ -177,8 +187,10 @@ class EvolveWordsApp(App[None]):
             yield IntInput("300")
             yield Rule(orientation="vertical")
             yield Label("Generation: 0", id="generation")
-        yield Static(id="words")
-        yield Log()
+        with VerticalScroll() as wrapper:
+            wrapper.border_title = "Resulting words"
+            yield Static(id="words")
+        yield AppLog()
 
     def find_words(self) -> Path | None:
         """Find a suitable source of words.
