@@ -162,7 +162,6 @@ class EvolveWordsApp(App[None]):
     def __init__(self) -> None:
         super().__init__()
         self._words: set[str] = set()
-        self._progenitor = ""
 
     def compose(self) -> ComposeResult:
         """Compose the DOM of the app."""
@@ -192,6 +191,14 @@ class EvolveWordsApp(App[None]):
                 return candidate
         return None
 
+    def progenitor(self) -> str:
+        """Find a starting word.
+
+        Returns:
+            A random 3 letter word found in the full collection of words.
+        """
+        return choice([word for word in self._words if len(word) == 3])
+
     class Ready(Message):
         """Message to say that the app is ready to go."""
 
@@ -200,7 +207,6 @@ class EvolveWordsApp(App[None]):
         """Load the words that will be used as the fitness test."""
         if words := self.find_words():
             self._words = set(word.lower() for word in words.read_text(encoding="utf-8").split())
-            self._progenitor = choice([word for word in self._words if len(word) == 3])
             self.post_message(self.Ready())
         else:
             self.bell()
@@ -216,7 +222,7 @@ class EvolveWordsApp(App[None]):
         self.query_one("#fitness-landscape", Label).update(
             f"Fitness landscape size: {len(self._words)} words"
         )
-        self.query_one("#progenitor", Label).update(f"Progenitor: {self._progenitor}")
+        self.query_one("#progenitor", Label).update("Progenitor: TBD")
         self.query_one("#evolve").disabled = False
         self.query_one("#evolve").focus()
 
@@ -233,8 +239,10 @@ class EvolveWordsApp(App[None]):
             self.start_world()
             return
         self.query_one("#words", Static).update("")
-        self.query_one(Log).clear()
-        self.run_world(target_population)
+        progenitor = self.progenitor()
+        self.query_one(Log).clear().write_line(f"Progenitor selected: {progenitor}")
+        self.query_one("#progenitor", Label).update(f"Progenitor: {progenitor}")
+        self.run_world(progenitor, target_population)
 
     @dataclass
     class Progress(Message):
@@ -259,12 +267,12 @@ class EvolveWordsApp(App[None]):
         )
 
     @work(thread=True, exclusive=True)
-    def run_world(self, target_population: int) -> None:
+    def run_world(self, progenitor: str, target_population: int) -> None:
         """Run the world within a thread."""
 
         # Get set up.
         worker = get_current_worker()
-        population = [self._progenitor]
+        population = [progenitor]
         generation = 0
 
         # While the population hasn't reached the target value....
