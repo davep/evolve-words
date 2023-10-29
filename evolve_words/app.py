@@ -15,9 +15,10 @@ from string import ascii_lowercase
 # Textual imports.
 from textual import on, work
 from textual.app import App, ComposeResult
+from textual.binding import Binding
 from textual.containers import Horizontal, VerticalScroll
 from textual.message import Message
-from textual.widgets import Button, Header, Input, Label, Log, Rule, Static
+from textual.widgets import Button, Footer, Header, Input, Label, Log, Rule, Static
 from textual.worker import get_current_worker
 
 
@@ -173,6 +174,8 @@ class EvolveWordsApp(App[None]):
     }
     """
 
+    BINDINGS = [Binding("ctrl+q", "quit", "Quit")]
+
     def __init__(self) -> None:
         super().__init__()
         self._words: set[str] = set()
@@ -195,6 +198,7 @@ class EvolveWordsApp(App[None]):
             wrapper.border_title = "Resulting words"
             yield Static(id="words")
         yield AppLog()
+        yield Footer()
 
     def find_words(self) -> Path | None:
         """Find a suitable source of words.
