@@ -2,6 +2,7 @@
 
 from .app import EvolveWordsApp
 
+
 def run() -> None:
     """Run the application."""
     EvolveWordsApp().run()

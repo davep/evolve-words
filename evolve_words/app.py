@@ -20,6 +20,7 @@ from textual.message import Message
 from textual.widgets import Button, Header, Input, Label, Log, Rule, Static
 from textual.worker import get_current_worker
 
+
 ##############################################################################
 class IntInput(Input):
     """A simple integer input widget."""
@@ -55,6 +56,7 @@ class IntInput(Input):
                 value = self.value
         return value
 
+
 ##############################################################################
 class Mutate:
     """Utility class for mutating words."""
@@ -80,8 +82,8 @@ class Mutate:
         """
         if not word:
             return word
-        position = randint(0, len(word)-1)
-        return word[:position] + Mutate.random_char() + word[position+1:]
+        position = randint(0, len(word) - 1)
+        return word[:position] + Mutate.random_char() + word[position + 1 :]
 
     @staticmethod
     def deletion(word: str) -> str:
@@ -95,8 +97,8 @@ class Mutate:
         """
         if not word:
             return word
-        position = randint(0, len(word)-1)
-        return word[:position] + word[position+1:]
+        position = randint(0, len(word) - 1)
+        return word[:position] + word[position + 1 :]
 
     @staticmethod
     def insertion(word: str) -> str:
@@ -110,7 +112,7 @@ class Mutate:
         """
         if not word:
             return word
-        position = randint(0, len(word)-1)
+        position = randint(0, len(word) - 1)
         return word[:position] + Mutate.random_char() + word[position:]
 
     @staticmethod
@@ -125,11 +127,13 @@ class Mutate:
         """
         return choice((Mutate.point, Mutate.deletion, Mutate.insertion))(word)
 
+
 ##############################################################################
 class AppLog(Log):
     """The log widget for the app."""
 
     BORDER_TITLE = "Log"
+
 
 ##############################################################################
 class EvolveWordsApp(App[None]):
@@ -218,11 +222,15 @@ class EvolveWordsApp(App[None]):
     def load_words(self) -> None:
         """Load the words that will be used as the fitness test."""
         if words := self.find_words():
-            self._words = set(word.lower() for word in words.read_text(encoding="utf-8").split())
+            self._words = set(
+                word.lower() for word in words.read_text(encoding="utf-8").split()
+            )
             self.post_message(self.Ready())
         else:
             self.bell()
-            self.notify("Could not find a source of words", severity="error", timeout=60)
+            self.notify(
+                "Could not find a source of words", severity="error", timeout=60
+            )
 
     def on_mount(self) -> None:
         """Configure the application once the DOM is mounted."""
@@ -259,6 +267,7 @@ class EvolveWordsApp(App[None]):
     @dataclass
     class Progress(Message):
         """Message sent to report the progress."""
+
         population_size: int
         unique_words: set[str]
         generation: int
@@ -289,7 +298,6 @@ class EvolveWordsApp(App[None]):
 
         # While the population hasn't reached the target value....
         while len(population) < target_population:
-
             # Give up if we've been stopped.
             if worker.is_cancelled:
                 return
@@ -303,13 +311,19 @@ class EvolveWordsApp(App[None]):
             population = [word for word in population if word in self._words]
 
             # Update the UI with our progress.
-            self.post_message(self.Progress(
-                len(population), set(population), generation, before - len(population)
-            ))
+            self.post_message(
+                self.Progress(
+                    len(population),
+                    set(population),
+                    generation,
+                    before - len(population),
+                )
+            )
 
             # Next population.
             generation += 1
 
         self.bell()
+
 
 ### app.py ends here
