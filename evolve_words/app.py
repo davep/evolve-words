@@ -365,13 +365,17 @@ class EvolveWordsApp(App[None]):
 
         # While the population hasn't reached the target value....
         while len(population) < target_population:
-            # Give up if we've been stopped.
-            if worker.is_cancelled:
-                return
-
             # Create an offspring from each word in the population, randomly
-            # mutating as we do; then add them to the population.
-            population.extend([Mutate.randomly(word) for word in population])
+            # mutating as we do; then add them to the population. Note that
+            # we do this long-handed because we want to frequently check if
+            # the thread has been called on to cancel; we don't want a quit
+            # of the application to be lagged.
+            offspring: list[str] = []
+            for word in population:
+                if worker.is_cancelled:
+                    return
+                offspring.append(Mutate.randomly(word))
+            population.extend(offspring)
 
             # Now cull all of the words that aren't "fit".
             before = len(population)
