@@ -147,13 +147,6 @@ class SizeCount(PlotextPlot):
 
     BORDER_TITLE = "Word Size Frequency"
 
-    DEFAULT_CSS = """
-    SizeCount {
-        border-top: panel cornflowerblue 70%;
-        background: $panel;
-    }
-    """
-
     def on_mount(self) -> None:
         """Configure the plot once the DOM is ready."""
         self.plt.xlabel("Word Size")
@@ -168,6 +161,24 @@ class SizeCount(PlotextPlot):
         counts = OrderedDict(Counter([len(word) for word in unique_words]))
         self.plt.cld()
         self.plt.bar(list(counts.keys()), list(counts.values()))
+        self.refresh()
+
+
+##############################################################################
+class SurvivalRate(PlotextPlot):
+    """A plot of the survival rate."""
+
+    BORDER_TITLE = "Survival Rate"
+
+    def on_mount(self) -> None:
+        self.plt.xlabel("Generation")
+        self.plt.ylabel("%age")
+
+    def update(self, survival_history: list[float]) -> None:
+        self.plt.cld()
+        self.plt.yticks([0, 25, 50, 75, 100], ["0%", "25%", "50%", "75%", "100%"])
+        self.plt.ylim(0, 100)
+        self.plt.plot(survival_history, marker="braille")
         self.refresh()
 
 
@@ -196,6 +207,15 @@ class EvolveWordsApp(App[None]):
 
     VerticalScroll:focus {
         border-top: panel cornflowerblue;
+    }
+
+    #plots {
+        height: 1fr;
+    }
+
+    PlotextPlot {
+        border-top: panel cornflowerblue 70%;
+        background: $panel;
     }
 
     Log {
@@ -232,7 +252,9 @@ class EvolveWordsApp(App[None]):
         with VerticalScroll() as wrapper:
             wrapper.border_title = "Resulting words"
             yield Static(id="words")
-        yield SizeCount()
+        with Horizontal(id="plots"):
+            yield SizeCount()
+            yield SurvivalRate()
         yield AppLog()
         yield Footer()
 
@@ -313,6 +335,7 @@ class EvolveWordsApp(App[None]):
         unique_words: set[str]
         generation: int
         last_cull: int
+        survival_history: list[float]
 
     @on(Progress)
     def update_progress(self, event: Progress) -> None:
@@ -322,6 +345,7 @@ class EvolveWordsApp(App[None]):
             event: The message containing the progress information.
         """
         self.query_one(SizeCount).update(event.unique_words)
+        self.query_one(SurvivalRate).update(event.survival_history)
         self.query_one("#words", Static).update(" ".join(sorted(event.unique_words)))
         self.query_one("#generation", Label).update(f"Generation: {event.generation}")
         self.query_one(Log).write_line(
@@ -337,6 +361,7 @@ class EvolveWordsApp(App[None]):
         worker = get_current_worker()
         population = [progenitor]
         generation = 0
+        survival: list[float] = []
 
         # While the population hasn't reached the target value....
         while len(population) < target_population:
@@ -351,6 +376,7 @@ class EvolveWordsApp(App[None]):
             # Now cull all of the words that aren't "fit".
             before = len(population)
             population = [word for word in population if word in self._words]
+            survival.append((100 / before) * len(population))
 
             # Update the UI with our progress.
             self.post_message(
@@ -359,6 +385,7 @@ class EvolveWordsApp(App[None]):
                     set(population),
                     generation,
                     before - len(population),
+                    survival,
                 )
             )
 
