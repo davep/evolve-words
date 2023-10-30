@@ -7,6 +7,7 @@ from dataclasses import dataclass
 
 ##############################################################################
 # Python imports.
+from collections import Counter, OrderedDict
 from pathlib import Path
 from random import choice, randint
 from string import ascii_lowercase
@@ -20,6 +21,10 @@ from textual.containers import Horizontal, VerticalScroll
 from textual.message import Message
 from textual.widgets import Button, Footer, Header, Input, Label, Log, Rule, Static
 from textual.worker import get_current_worker
+
+##############################################################################
+# Textual Plotext imports.
+from textual_plotext import PlotextPlot
 
 
 ##############################################################################
@@ -137,6 +142,36 @@ class AppLog(Log):
 
 
 ##############################################################################
+class SizeCount(PlotextPlot):
+    """Plot of the count of word sizes."""
+
+    BORDER_TITLE = "Word Size Frequency"
+
+    DEFAULT_CSS = """
+    SizeCount {
+        border-top: panel cornflowerblue 70%;
+        background: $panel;
+    }
+    """
+
+    def on_mount(self) -> None:
+        """Configure the plot once the DOM is ready."""
+        self.plt.xlabel("Word Size")
+        self.plt.ylabel("Frequency")
+
+    def update(self, unique_words: set[str]) -> None:
+        """Update the plot.
+
+        Args:
+            unique_words: The set of unique words found so far.
+        """
+        counts = OrderedDict(Counter([len(word) for word in unique_words]))
+        self.plt.cld()
+        self.plt.bar(list(counts.keys()), list(counts.values()))
+        self.refresh()
+
+
+##############################################################################
 class EvolveWordsApp(App[None]):
     """An application that demonstrates evolution through mutation."""
 
@@ -155,7 +190,7 @@ class EvolveWordsApp(App[None]):
 
     VerticalScroll {
         border-top: panel cornflowerblue 70%;
-        height: 2fr;
+        height: 1fr;
         background: $panel;
     }
 
@@ -197,6 +232,7 @@ class EvolveWordsApp(App[None]):
         with VerticalScroll() as wrapper:
             wrapper.border_title = "Resulting words"
             yield Static(id="words")
+        yield SizeCount()
         yield AppLog()
         yield Footer()
 
@@ -285,6 +321,7 @@ class EvolveWordsApp(App[None]):
         Args:
             event: The message containing the progress information.
         """
+        self.query_one(SizeCount).update(event.unique_words)
         self.query_one("#words", Static).update(" ".join(sorted(event.unique_words)))
         self.query_one("#generation", Label).update(f"Generation: {event.generation}")
         self.query_one(Log).write_line(

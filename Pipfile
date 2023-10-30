@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 textual = "*"
+textual-plotext = "*"
 
 [dev-packages]
 pre-commit = "*"
