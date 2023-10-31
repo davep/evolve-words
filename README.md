@@ -21,6 +21,8 @@ might be fun.
 
 ![Evolve Words](https://raw.githubusercontent.com/davep/evolve-words/main/evolve-words.png)
 
+This is a version of
+[`selection2`](https://github.com/davep/selection/blob/master/selection2).
 Turns out it *is* fun!
 
 ## Installation
