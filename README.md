@@ -36,4 +36,17 @@ $ pipx install evolve-words
 
 then simply run `evolve-words`.
 
+## Requirements
+
+While this code *should* work fine on any operating system, it's really
+coded to work on a system that provides one of the two following files:
+
+- `/usr/dict/words`
+- `/usr/share/dict/words`
+
+That does, of course, mean it's unlikely to work fine on Windows given
+neither of them will be there. At some point in the very near future I'll
+add support for loading words from a file whose name is passed on the
+command line, or something similar.
+
 [//]: # (README.md ends here)
