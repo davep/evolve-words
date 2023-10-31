@@ -19,7 +19,7 @@ important.
 Fast forward 15 years and I was thinking that a Textual version of the code
 might be fun.
 
-![Evolve Words](evolve-words.png)
+![Evolve Words](https://raw.githubusercontent.com/davep/evolve-words/main/evolve-words.png)
 
 Turns out it *is* fun!
 
