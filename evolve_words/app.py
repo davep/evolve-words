@@ -34,8 +34,8 @@ class IntInput(Input):
     DEFAULT_CSS = """
     IntInput {
         border: none;
-        min-width: 5;
-        width: auto;
+        width: 1fr;
+        max-width: 10;
         padding: 0;
         margin-top: 1;
     }
