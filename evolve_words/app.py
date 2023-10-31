@@ -194,7 +194,7 @@ class EvolveWordsApp(App[None]):
         background: $panel;
     }
 
-    Horizontal Label {
+    #io-bar Label {
         height: 100%;
         content-align: left middle;
     }
