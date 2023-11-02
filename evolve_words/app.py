@@ -153,7 +153,7 @@ class AppLog(Log):
 
 
 ##############################################################################
-class SizeCounts(DataTable):
+class SizeCounts(DataTable, can_focus=False):
     """Details of the size counts."""
 
     BORDER_TITLE = "Counts"
@@ -258,10 +258,6 @@ class EvolveWordsApp(App[None]):
         background: $panel;
     }
 
-    DataTable:focus {
-        border-top: panel cornflowerblue;
-    }
-
     PlotextPlot {
         width: 3fr;
     }
@@ -278,6 +274,8 @@ class EvolveWordsApp(App[None]):
     """
 
     BINDINGS = [Binding("ctrl+q", "quit", "Quit")]
+
+    ENABLE_COMMAND_PALETTE = False
 
     DEFAULT_TARGET: Final[int] = 3_000
     """The default target population."""
