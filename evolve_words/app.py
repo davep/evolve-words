@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from random import choice, randint
 from string import ascii_lowercase
+from typing_extensions import Final
 
 ##############################################################################
 # Textual imports.
@@ -231,6 +232,9 @@ class EvolveWordsApp(App[None]):
 
     BINDINGS = [Binding("ctrl+q", "quit", "Quit")]
 
+    DEFAULT_TARGET: Final[int] = 3_000
+    """The default target population."""
+
     def __init__(self) -> None:
         super().__init__()
         self._words: set[str] = set()
@@ -244,7 +248,7 @@ class EvolveWordsApp(App[None]):
             yield Label("Loading...", id="fitness-landscape")
             yield Rule(orientation="vertical")
             yield Label("Target population size: ")
-            yield IntInput("300")
+            yield IntInput(str(self.DEFAULT_TARGET))
             yield Rule(orientation="vertical")
             yield Label("Loading...", id="progenitor")
             yield Rule(orientation="vertical")
@@ -318,7 +322,7 @@ class EvolveWordsApp(App[None]):
         except ValueError:
             target_population = 0
         if target_population < 1:
-            self.query_one(IntInput).value = "300"
+            self.query_one(IntInput).value = str(self.DEFAULT_TARGET)
             self.start_world()
             return
         self.query_one("#words", Static).update("")
