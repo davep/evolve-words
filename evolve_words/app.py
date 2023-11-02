@@ -3,11 +3,11 @@
 ##############################################################################
 # Backward compatibility.
 from __future__ import annotations
-from dataclasses import dataclass
 
 ##############################################################################
 # Python imports.
 from collections import Counter, OrderedDict
+from dataclasses import dataclass
 from pathlib import Path
 from random import choice, randint
 from string import ascii_lowercase
