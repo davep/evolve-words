@@ -6,7 +6,7 @@ from __future__ import annotations
 
 ##############################################################################
 # Python imports.
-from collections import Counter, OrderedDict
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from random import choice, randint
@@ -159,7 +159,7 @@ class SizeCount(PlotextPlot):
         Args:
             unique_words: The set of unique words found so far.
         """
-        counts = OrderedDict(Counter([len(word) for word in unique_words]))
+        counts = dict(Counter([len(word) for word in unique_words]))
         self.plt.cld()
         self.plt.bar(list(counts.keys()), list(counts.values()))
         self.refresh()
