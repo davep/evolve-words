@@ -31,7 +31,6 @@ from textual.widgets import (
     Rule,
     Static,
 )
-from textual.widgets.data_table import CellDoesNotExist
 from textual.worker import get_current_worker
 
 ##############################################################################
