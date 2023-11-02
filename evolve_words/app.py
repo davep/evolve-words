@@ -20,7 +20,18 @@ from textual.app import App, ComposeResult
 from textual.binding import Binding
 from textual.containers import Horizontal, VerticalScroll
 from textual.message import Message
-from textual.widgets import Button, Footer, Header, Input, Label, Log, Rule, Static
+from textual.widgets import (
+    Button,
+    DataTable,
+    Footer,
+    Header,
+    Input,
+    Label,
+    Log,
+    Rule,
+    Static,
+)
+from textual.widgets.data_table import CellDoesNotExist
 from textual.worker import get_current_worker
 
 ##############################################################################
@@ -143,10 +154,39 @@ class AppLog(Log):
 
 
 ##############################################################################
-class SizeCount(PlotextPlot):
+class SizeCounts(DataTable):
+    """Details of the size counts."""
+
+    BORDER_TITLE = "Counts"
+
+    def on_mount(self) -> None:
+        """Configure the table once the DOM is ready."""
+        self.cursor_type = "none"
+        self.add_column("Word Size", key="size")
+        self.add_column("Count", key="count")
+
+    def update(self, unique_words: set[str]) -> None:
+        """Update the table.
+
+        Args:
+            unique_words: The set of unique words found so far.
+        """
+        self.clear()
+        self.add_rows(
+            [
+                (size, count)
+                for size, count in sorted(
+                    dict(Counter(len(word) for word in unique_words)).items()
+                )
+            ]
+        )
+
+
+##############################################################################
+class SizeCountPlot(PlotextPlot):
     """Plot of the count of word sizes."""
 
-    BORDER_TITLE = "Word Size Frequency"
+    BORDER_TITLE = "Word Size Frequency (Plot)"
 
     def on_mount(self) -> None:
         """Configure the plot once the DOM is ready."""
@@ -214,9 +254,17 @@ class EvolveWordsApp(App[None]):
         height: 1fr;
     }
 
-    PlotextPlot {
+    PlotextPlot, DataTable {
         border-top: panel cornflowerblue 70%;
         background: $panel;
+    }
+
+    DataTable:focus {
+        border-top: panel cornflowerblue;
+    }
+
+    PlotextPlot {
+        width: 3fr;
     }
 
     Log {
@@ -257,7 +305,8 @@ class EvolveWordsApp(App[None]):
             wrapper.border_title = "Resulting words"
             yield Static(id="words")
         with Horizontal(id="plots"):
-            yield SizeCount()
+            yield SizeCounts()
+            yield SizeCountPlot()
             yield SurvivalRate()
         yield AppLog()
         yield Footer()
@@ -348,7 +397,8 @@ class EvolveWordsApp(App[None]):
         Args:
             event: The message containing the progress information.
         """
-        self.query_one(SizeCount).update(event.unique_words)
+        self.query_one(SizeCounts).update(event.unique_words)
+        self.query_one(SizeCountPlot).update(event.unique_words)
         self.query_one(SurvivalRate).update(event.survival_history)
         self.query_one("#words", Static).update(" ".join(sorted(event.unique_words)))
         self.query_one("#generation", Label).update(f"Generation: {event.generation}")
