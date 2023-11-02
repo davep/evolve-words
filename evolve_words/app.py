@@ -159,7 +159,7 @@ class SizeCount(PlotextPlot):
         Args:
             unique_words: The set of unique words found so far.
         """
-        counts = dict(Counter([len(word) for word in unique_words]))
+        counts = dict(Counter(len(word) for word in unique_words))
         self.plt.cld()
         self.plt.bar(list(counts.keys()), list(counts.values()))
         self.refresh()
