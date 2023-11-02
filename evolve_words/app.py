@@ -363,8 +363,8 @@ class EvolveWordsApp(App[None]):
         generation = 0
         survival: list[float] = []
 
-        # While the population hasn't reached the target value....
-        while len(population) < target_population:
+        # While the population hasn't reached the target value, or collapsed....
+        while population and len(population) < target_population:
             # Create an offspring from each word in the population, randomly
             # mutating as we do; then add them to the population. Note that
             # we do this long-handed because we want to frequently check if
@@ -380,7 +380,10 @@ class EvolveWordsApp(App[None]):
             # Now cull all of the words that aren't "fit".
             before = len(population)
             population = [word for word in population if word in self._words]
-            survival.append((100 / before) * len(population))
+            if population:
+                survival.append((100 / before) * len(population))
+            else:
+                survival.append(0)
 
             # Update the UI with our progress.
             self.post_message(
@@ -397,9 +400,14 @@ class EvolveWordsApp(App[None]):
             generation += 1
 
         # Get the user's attention to let them know we've completed the run.
-        self.notify(
-            f"Generated {len(set(population))} unique words in {generation} generations."
-        )
+        if population:
+            self.notify(
+                f"Generated {len(set(population))} unique words in {generation} generations."
+            )
+        else:
+            self.notify(
+                f"The population collapsed; nobody is left.", severity="warning"
+            )
         self.bell()
 
 
