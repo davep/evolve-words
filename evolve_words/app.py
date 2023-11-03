@@ -178,7 +178,7 @@ class SizeCounts(Vertical):
         data.clear()
         data.add_rows(
             [
-                (size, count)
+                (size, f"{count:,}")
                 for size, count in sorted(
                     dict(Counter(len(word) for word in unique_words)).items()
                 )
