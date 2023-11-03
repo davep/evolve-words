@@ -377,7 +377,7 @@ class EvolveWordsApp(App[None]):
         self.query_one("#fitness-landscape", Label).update(
             f"Fitness landscape size: {len(self._words)} words"
         )
-        self.query_one("#progenitor", Label).update("Progenitor: TBD")
+        self.query_one("#progenitor", Label).update("Progenitor: ?")
         self.query_one("#evolve").disabled = False
         self.query_one("#evolve").focus()
 
