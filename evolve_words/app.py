@@ -216,10 +216,16 @@ class SurvivalRate(PlotextPlot):
     BORDER_TITLE = "Survival Rate"
 
     def on_mount(self) -> None:
+        """Configure the plot once the DOM is ready."""
         self.plt.xlabel("Generation")
         self.plt.ylabel("%age")
 
     def update(self, survival_history: list[float]) -> None:
+        """Update the plot.
+
+        Args:
+            survival_history: The history of survival rates of each generation.
+        """
         self.plt.cld()
         self.plt.yticks([0, 25, 50, 75, 100], ["0%", "25%", "50%", "75%", "100%"])
         self.plt.ylim(0, 100)
