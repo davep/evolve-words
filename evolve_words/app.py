@@ -6,20 +6,31 @@ from __future__ import annotations
 
 ##############################################################################
 # Python imports.
-from collections import Counter, OrderedDict
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 from random import choice, randint
 from string import ascii_lowercase
+from typing_extensions import Final
 
 ##############################################################################
 # Textual imports.
 from textual import on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal, VerticalScroll
+from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.message import Message
-from textual.widgets import Button, Footer, Header, Input, Label, Log, Rule, Static
+from textual.widgets import (
+    Button,
+    DataTable,
+    Footer,
+    Header,
+    Input,
+    Label,
+    Log,
+    Rule,
+    Static,
+)
 from textual.worker import get_current_worker
 
 ##############################################################################
@@ -142,10 +153,44 @@ class AppLog(Log):
 
 
 ##############################################################################
-class SizeCount(PlotextPlot):
+class SizeCounts(Vertical):
+    """Details of the size counts."""
+
+    BORDER_TITLE = "Counts"
+
+    def compose(self) -> ComposeResult:
+        yield DataTable()
+
+    def on_mount(self) -> None:
+        """Configure the table once the DOM is ready."""
+        data = self.query_one(DataTable)
+        data.cursor_type = "none"
+        data.add_column("Word Size", key="size")
+        data.add_column("Count", key="count")
+
+    def update(self, unique_words: set[str]) -> None:
+        """Update the table.
+
+        Args:
+            unique_words: The set of unique words found so far.
+        """
+        data = self.query_one(DataTable)
+        data.clear()
+        data.add_rows(
+            [
+                (size, f"{count:,}")
+                for size, count in sorted(
+                    dict(Counter(len(word) for word in unique_words)).items()
+                )
+            ]
+        )
+
+
+##############################################################################
+class SizeCountPlot(PlotextPlot):
     """Plot of the count of word sizes."""
 
-    BORDER_TITLE = "Word Size Frequency"
+    BORDER_TITLE = "Word Size Frequency (Plot)"
 
     def on_mount(self) -> None:
         """Configure the plot once the DOM is ready."""
@@ -158,7 +203,7 @@ class SizeCount(PlotextPlot):
         Args:
             unique_words: The set of unique words found so far.
         """
-        counts = OrderedDict(Counter([len(word) for word in unique_words]))
+        counts = dict(Counter(len(word) for word in unique_words))
         self.plt.cld()
         self.plt.bar(list(counts.keys()), list(counts.values()))
         self.refresh()
@@ -171,10 +216,16 @@ class SurvivalRate(PlotextPlot):
     BORDER_TITLE = "Survival Rate"
 
     def on_mount(self) -> None:
+        """Configure the plot once the DOM is ready."""
         self.plt.xlabel("Generation")
         self.plt.ylabel("%age")
 
     def update(self, survival_history: list[float]) -> None:
+        """Update the plot.
+
+        Args:
+            survival_history: The history of survival rates of each generation.
+        """
         self.plt.cld()
         self.plt.yticks([0, 25, 50, 75, 100], ["0%", "25%", "50%", "75%", "100%"])
         self.plt.ylim(0, 100)
@@ -189,6 +240,10 @@ class EvolveWordsApp(App[None]):
     TITLE = "Evolve Words"
 
     CSS = """
+    * {
+        border-title-align: center;
+    }
+
     Horizontal {
         height: auto;
         background: $panel;
@@ -209,13 +264,28 @@ class EvolveWordsApp(App[None]):
         border-top: panel cornflowerblue;
     }
 
-    #plots {
+    #counts {
         height: 1fr;
     }
 
-    PlotextPlot {
+    SizeCounts, PlotextPlot {
         border-top: panel cornflowerblue 70%;
         background: $panel;
+    }
+
+    DataTable {
+        background: $panel;
+        border: solid cornflowerblue;
+        color: $accent-lighten-2;
+        height: 1fr;
+    }
+
+    DataTable > .datatable--header {
+        color: $accent-lighten-2;
+    }
+
+    PlotextPlot {
+        width: 3fr;
     }
 
     Log {
@@ -231,6 +301,11 @@ class EvolveWordsApp(App[None]):
 
     BINDINGS = [Binding("ctrl+q", "quit", "Quit")]
 
+    ENABLE_COMMAND_PALETTE = False
+
+    DEFAULT_TARGET: Final[int] = 3_000
+    """The default target population."""
+
     def __init__(self) -> None:
         super().__init__()
         self._words: set[str] = set()
@@ -244,7 +319,7 @@ class EvolveWordsApp(App[None]):
             yield Label("Loading...", id="fitness-landscape")
             yield Rule(orientation="vertical")
             yield Label("Target population size: ")
-            yield IntInput("300")
+            yield IntInput(str(self.DEFAULT_TARGET))
             yield Rule(orientation="vertical")
             yield Label("Loading...", id="progenitor")
             yield Rule(orientation="vertical")
@@ -252,8 +327,9 @@ class EvolveWordsApp(App[None]):
         with VerticalScroll() as wrapper:
             wrapper.border_title = "Resulting words"
             yield Static(id="words")
-        with Horizontal(id="plots"):
-            yield SizeCount()
+        with Horizontal(id="counts"):
+            yield SizeCounts()
+            yield SizeCountPlot()
             yield SurvivalRate()
         yield AppLog()
         yield Footer()
@@ -273,9 +349,11 @@ class EvolveWordsApp(App[None]):
         """Find a starting word.
 
         Returns:
-            A random 3 letter word found in the full collection of words.
+            A random 1 letter word found in the full collection of words.
         """
-        return choice([word for word in self._words if len(word) == 3])
+        # Sure, I could just generate a random ASCII letter, but this way we
+        # ensure that we've picked a word that is in the source list.
+        return choice([word for word in self._words if len(word) == 1])
 
     class Ready(Message):
         """Message to say that the app is ready to go."""
@@ -305,7 +383,7 @@ class EvolveWordsApp(App[None]):
         self.query_one("#fitness-landscape", Label).update(
             f"Fitness landscape size: {len(self._words)} words"
         )
-        self.query_one("#progenitor", Label).update("Progenitor: TBD")
+        self.query_one("#progenitor", Label).update("Progenitor: ?")
         self.query_one("#evolve").disabled = False
         self.query_one("#evolve").focus()
 
@@ -318,7 +396,7 @@ class EvolveWordsApp(App[None]):
         except ValueError:
             target_population = 0
         if target_population < 1:
-            self.query_one(IntInput).value = "300"
+            self.query_one(IntInput).value = str(self.DEFAULT_TARGET)
             self.start_world()
             return
         self.query_one("#words", Static).update("")
@@ -332,10 +410,15 @@ class EvolveWordsApp(App[None]):
         """Message sent to report the progress."""
 
         population_size: int
+        """The current population size."""
         unique_words: set[str]
+        """The set of unique words that have been created."""
         generation: int
+        """The generation number."""
         last_cull: int
+        """How many words were culled in the last cull."""
         survival_history: list[float]
+        """The survival rate history."""
 
     @on(Progress)
     def update_progress(self, event: Progress) -> None:
@@ -344,7 +427,8 @@ class EvolveWordsApp(App[None]):
         Args:
             event: The message containing the progress information.
         """
-        self.query_one(SizeCount).update(event.unique_words)
+        self.query_one(SizeCounts).update(event.unique_words)
+        self.query_one(SizeCountPlot).update(event.unique_words)
         self.query_one(SurvivalRate).update(event.survival_history)
         self.query_one("#words", Static).update(" ".join(sorted(event.unique_words)))
         self.query_one("#generation", Label).update(f"Generation: {event.generation}")
@@ -405,9 +489,7 @@ class EvolveWordsApp(App[None]):
                 f"Generated {len(set(population))} unique words in {generation} generations."
             )
         else:
-            self.notify(
-                f"The population collapsed; nobody is left.", severity="warning"
-            )
+            self.notify("The population collapsed; nobody is left.", severity="warning")
         self.bell()
 
 
