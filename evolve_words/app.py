@@ -410,10 +410,15 @@ class EvolveWordsApp(App[None]):
         """Message sent to report the progress."""
 
         population_size: int
+        """The current population size."""
         unique_words: set[str]
+        """The set of unique words that have been created."""
         generation: int
+        """The generation number."""
         last_cull: int
+        """How many words were culled in the last cull."""
         survival_history: list[float]
+        """The survival rate history."""
 
     @on(Progress)
     def update_progress(self, event: Progress) -> None:
