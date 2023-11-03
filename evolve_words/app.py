@@ -478,9 +478,7 @@ class EvolveWordsApp(App[None]):
                 f"Generated {len(set(population))} unique words in {generation} generations."
             )
         else:
-            self.notify(
-                f"The population collapsed; nobody is left.", severity="warning"
-            )
+            self.notify("The population collapsed; nobody is left.", severity="warning")
         self.bell()
 
 
