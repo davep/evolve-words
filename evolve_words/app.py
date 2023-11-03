@@ -18,7 +18,7 @@ from typing_extensions import Final
 from textual import on, work
 from textual.app import App, ComposeResult
 from textual.binding import Binding
-from textual.containers import Horizontal, VerticalScroll
+from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.message import Message
 from textual.widgets import (
     Button,
@@ -153,16 +153,20 @@ class AppLog(Log):
 
 
 ##############################################################################
-class SizeCounts(DataTable, can_focus=False):
+class SizeCounts(Vertical):
     """Details of the size counts."""
 
     BORDER_TITLE = "Counts"
 
+    def compose(self) -> ComposeResult:
+        yield DataTable()
+
     def on_mount(self) -> None:
         """Configure the table once the DOM is ready."""
-        self.cursor_type = "none"
-        self.add_column("Word Size", key="size")
-        self.add_column("Count", key="count")
+        data = self.query_one(DataTable)
+        data.cursor_type = "none"
+        data.add_column("Word Size", key="size")
+        data.add_column("Count", key="count")
 
     def update(self, unique_words: set[str]) -> None:
         """Update the table.
@@ -170,8 +174,9 @@ class SizeCounts(DataTable, can_focus=False):
         Args:
             unique_words: The set of unique words found so far.
         """
-        self.clear()
-        self.add_rows(
+        data = self.query_one(DataTable)
+        data.clear()
+        data.add_rows(
             [
                 (size, count)
                 for size, count in sorted(
@@ -253,9 +258,20 @@ class EvolveWordsApp(App[None]):
         height: 1fr;
     }
 
-    PlotextPlot, DataTable {
+    SizeCounts, PlotextPlot {
         border-top: panel cornflowerblue 70%;
         background: $panel;
+    }
+
+    DataTable {
+        background: $panel;
+        border: solid cornflowerblue;
+        color: $accent-lighten-2;
+        height: 1fr;
+    }
+
+    DataTable > .datatable--header {
+        color: $accent-lighten-2;
     }
 
     PlotextPlot {
