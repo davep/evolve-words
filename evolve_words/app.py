@@ -254,7 +254,7 @@ class EvolveWordsApp(App[None]):
         border-top: panel cornflowerblue;
     }
 
-    #plots {
+    #counts {
         height: 1fr;
     }
 
@@ -317,7 +317,7 @@ class EvolveWordsApp(App[None]):
         with VerticalScroll() as wrapper:
             wrapper.border_title = "Resulting words"
             yield Static(id="words")
-        with Horizontal(id="plots"):
+        with Horizontal(id="counts"):
             yield SizeCounts()
             yield SizeCountPlot()
             yield SurvivalRate()
