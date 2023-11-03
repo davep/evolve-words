@@ -343,9 +343,11 @@ class EvolveWordsApp(App[None]):
         """Find a starting word.
 
         Returns:
-            A random 3 letter word found in the full collection of words.
+            A random 1 letter word found in the full collection of words.
         """
-        return choice([word for word in self._words if len(word) == 3])
+        # Sure, I could just generate a random ASCII letter, but this way we
+        # ensure that we've picked a word that is in the source list.
+        return choice([word for word in self._words if len(word) == 1])
 
     class Ready(Message):
         """Message to say that the app is ready to go."""
