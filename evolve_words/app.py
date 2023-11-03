@@ -234,6 +234,10 @@ class EvolveWordsApp(App[None]):
     TITLE = "Evolve Words"
 
     CSS = """
+    * {
+        border-title-align: center;
+    }
+
     Horizontal {
         height: auto;
         background: $panel;
