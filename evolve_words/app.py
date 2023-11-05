@@ -146,6 +146,29 @@ class Mutate:
 
 
 ##############################################################################
+class Words(VerticalScroll):
+    """Widget that shows the words that evolved."""
+
+    BORDER_TITLE = "Resulting words"
+
+    def compose(self) -> ComposeResult:
+        """Compose the widget."""
+        yield Static()
+
+    def clear(self) -> None:
+        """Clear the display."""
+        self.update(set())
+
+    def update(self, unique_words: set[str]) -> None:
+        """Update the display.
+
+        Args:
+            unique_words: The set of unique words found so far.
+        """
+        self.query_one(Static).update(" ".join(sorted(unique_words)))
+
+
+##############################################################################
 class AppLog(Log):
     """The log widget for the app."""
 
@@ -324,9 +347,7 @@ class EvolveWordsApp(App[None]):
             yield Label("Loading...", id="progenitor")
             yield Rule(orientation="vertical")
             yield Label("Generation: 0", id="generation")
-        with VerticalScroll() as wrapper:
-            wrapper.border_title = "Resulting words"
-            yield Static(id="words")
+        yield Words()
         with Horizontal(id="counts"):
             yield SizeCounts()
             yield SizeCountPlot()
@@ -399,7 +420,7 @@ class EvolveWordsApp(App[None]):
             self.query_one(IntInput).value = str(self.DEFAULT_TARGET)
             self.start_world()
             return
-        self.query_one("#words", Static).update("")
+        self.query_one(Words).clear()
         progenitor = self.progenitor()
         self.query_one(Log).clear().write_line(f"Progenitor selected: {progenitor}")
         self.query_one("#progenitor", Label).update(f"Progenitor: {progenitor}")
@@ -427,10 +448,10 @@ class EvolveWordsApp(App[None]):
         Args:
             event: The message containing the progress information.
         """
+        self.query_one(Words).update(event.unique_words)
         self.query_one(SizeCounts).update(event.unique_words)
         self.query_one(SizeCountPlot).update(event.unique_words)
         self.query_one(SurvivalRate).update(event.survival_history)
-        self.query_one("#words", Static).update(" ".join(sorted(event.unique_words)))
         self.query_one("#generation", Label).update(f"Generation: {event.generation}")
         self.query_one(Log).write_line(
             f"Generation #{event.generation}: {event.last_cull} mutations culled. "
