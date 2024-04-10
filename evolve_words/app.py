@@ -24,7 +24,6 @@ from textual.widgets import (
     Button,
     DataTable,
     Footer,
-    Header,
     Input,
     Label,
     Log,
@@ -335,7 +334,6 @@ class EvolveWordsApp(App[None]):
 
     def compose(self) -> ComposeResult:
         """Compose the DOM of the app."""
-        yield Header()
         with Horizontal(id="io-bar", disabled=True):
             yield Button("Evolve!", id="evolve")
             yield Rule(orientation="vertical")
