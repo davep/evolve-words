@@ -25,16 +25,29 @@ This is a version of
 [`selection2`](https://github.com/davep/selection/blob/master/selection2).
 Turns out it *is* fun!
 
-## Installation
+## Installing
 
-If you want to play with this, the best method is going to be to install
-with `pipx`:
+### pipx
+
+The package can be installed using [`pipx`](https://pypa.github.io/pipx/):
 
 ```sh
 $ pipx install evolve-words
 ```
 
-then simply run `evolve-words`.
+### Homebrew
+
+The package can be installed using Homebrew. Use the following commands to
+install:
+
+```sh
+$ brew tap davep/homebrew
+$ brew install evolve-words
+```
+
+## Running
+
+Once installed run the `evolve-words` command.
 
 ## Requirements
 
