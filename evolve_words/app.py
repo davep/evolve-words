@@ -48,6 +48,7 @@ class IntInput(Input):
         max-width: 10;
         padding: 0;
         margin-top: 1;
+        height: 1;
     }
 
     IntInput:focus {
