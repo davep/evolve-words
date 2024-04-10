@@ -49,10 +49,10 @@ class IntInput(Input):
         padding: 0;
         margin-top: 1;
         height: 1;
-    }
 
-    IntInput:focus {
-        border: none;
+        &:focus {
+            border: none;
+        }
     }
     """
 
@@ -281,10 +281,10 @@ class EvolveWordsApp(App[None]):
         border-top: panel cornflowerblue 70%;
         height: 1fr;
         background: $panel;
-    }
 
-    VerticalScroll:focus {
-        border-top: panel cornflowerblue;
+        &:focus {
+            border-top: panel cornflowerblue;
+        }
     }
 
     #counts {
@@ -301,10 +301,10 @@ class EvolveWordsApp(App[None]):
         border: solid cornflowerblue;
         color: $accent-lighten-2;
         height: 1fr;
-    }
 
-    DataTable > .datatable--header {
-        color: $accent-lighten-2;
+        &> .datatable--header {
+            color: $accent-lighten-2;
+        }
     }
 
     PlotextPlot {
@@ -315,10 +315,10 @@ class EvolveWordsApp(App[None]):
         border-top: panel cornflowerblue 70%;
         height: 1fr;
         background: $panel;
-    }
 
-    Log:focus {
-        border-top: panel cornflowerblue;
+        &:focus {
+            border-top: panel cornflowerblue;
+        }
     }
     """
 
