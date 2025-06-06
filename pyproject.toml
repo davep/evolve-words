@@ -1,5 +1,61 @@
-[build-system]
-requires = ["setuptools>=42", "wheel"]
-build-backend = "setuptools.build_meta"
+[project]
+name = "evolve-words"
+version = "0.2.1"
+description = "A simple illustration of mutation aiding evolution"
+authors = [
+    { name = "Dave Pearson", email = "davep@davep.org" }
+]
+dependencies = [
+    "textual>=3.3.0",
+    "textual-plotext>=0.2.1",
+]
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GNU General Public License v3 or later (GPLv3+)" }
+keywords = [
+    "evolution",
+    "science",
+    "example",
+    "illustration",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Terminals",
+    "Typing :: Typed",
+]
 
-### pyproject.toml ends here
+[project.scripts]
+evolve-words = "evolve_words.__main__:run"
+
+[build-system]
+# https://github.com/astral-sh/rye/issues/1446
+requires = ["hatchling==1.26.3", "hatch-vcs"]
+# requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "mypy>=1.16.0",
+    "codespell>=2.4.1",
+    "textual-dev>=1.7.0",
+    "pre-commit>=4.2.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/evolve_words"]
+
+[tool.pyright]
+venvPath="."
+venv=".venv"
+exclude=[".venv"]

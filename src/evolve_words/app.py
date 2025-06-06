@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from random import choice, randint
 from string import ascii_lowercase
-from typing_extensions import Final
 
 ##############################################################################
 # Textual imports.
@@ -35,6 +34,10 @@ from textual.worker import get_current_worker
 ##############################################################################
 # Textual Plotext imports.
 from textual_plotext import PlotextPlot
+
+##############################################################################
+# Typing extension imports.
+from typing_extensions import Final
 
 
 ##############################################################################
