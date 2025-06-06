@@ -220,6 +220,7 @@ class SizeCountPlot(PlotextPlot):
 
     def on_mount(self) -> None:
         """Configure the plot once the DOM is ready."""
+        self.theme = "textual-clear"
         self.plt.xlabel("Word Size")
         self.plt.ylabel("Frequency")
 
@@ -243,6 +244,7 @@ class SurvivalRate(PlotextPlot):
 
     def on_mount(self) -> None:
         """Configure the plot once the DOM is ready."""
+        self.theme = "textual-clear"
         self.plt.xlabel("Generation")
         self.plt.ylabel("%age")
 
@@ -266,13 +268,17 @@ class EvolveWordsApp(App[None]):
     TITLE = "Evolve Words"
 
     CSS = """
+
+    Screen {
+        background: $panel;
+    }
+
     * {
         border-title-align: center;
     }
 
     Horizontal {
-        height: auto;
-        background: $panel;
+        height: 3;
     }
 
     #io-bar Label {
@@ -283,7 +289,6 @@ class EvolveWordsApp(App[None]):
     VerticalScroll {
         border-top: panel cornflowerblue 70%;
         height: 1fr;
-        background: $panel;
 
         &:focus {
             border-top: panel cornflowerblue;
@@ -296,14 +301,13 @@ class EvolveWordsApp(App[None]):
 
     SizeCounts, PlotextPlot {
         border-top: panel cornflowerblue 70%;
-        background: $panel;
     }
 
     DataTable {
-        background: $panel;
         border: solid cornflowerblue;
         color: $accent-lighten-2;
         height: 1fr;
+        background: transparent;
 
         &> .datatable--header {
             color: $accent-lighten-2;
@@ -317,7 +321,7 @@ class EvolveWordsApp(App[None]):
     Log {
         border-top: panel cornflowerblue 70%;
         height: 1fr;
-        background: $panel;
+        background: transparent;
 
         &:focus {
             border-top: panel cornflowerblue;
