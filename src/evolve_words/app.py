@@ -11,7 +11,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from random import choice, randint
 from string import ascii_lowercase
-from typing_extensions import Final
 
 ##############################################################################
 # Textual imports.
@@ -35,6 +34,10 @@ from textual.worker import get_current_worker
 ##############################################################################
 # Textual Plotext imports.
 from textual_plotext import PlotextPlot
+
+##############################################################################
+# Typing extension imports.
+from typing_extensions import Final
 
 
 ##############################################################################
@@ -217,6 +220,7 @@ class SizeCountPlot(PlotextPlot):
 
     def on_mount(self) -> None:
         """Configure the plot once the DOM is ready."""
+        self.theme = "textual-clear"
         self.plt.xlabel("Word Size")
         self.plt.ylabel("Frequency")
 
@@ -240,6 +244,7 @@ class SurvivalRate(PlotextPlot):
 
     def on_mount(self) -> None:
         """Configure the plot once the DOM is ready."""
+        self.theme = "textual-clear"
         self.plt.xlabel("Generation")
         self.plt.ylabel("%age")
 
@@ -263,13 +268,16 @@ class EvolveWordsApp(App[None]):
     TITLE = "Evolve Words"
 
     CSS = """
+    Screen {
+        background: $panel;
+    }
+
     * {
         border-title-align: center;
     }
 
     Horizontal {
-        height: auto;
-        background: $panel;
+        height: 3;
     }
 
     #io-bar Label {
@@ -277,13 +285,13 @@ class EvolveWordsApp(App[None]):
         content-align: left middle;
     }
 
-    VerticalScroll {
-        border-top: panel cornflowerblue 70%;
+    VerticalScroll, Log {
+        border-top: panel $border;
         height: 1fr;
-        background: $panel;
-
+        background: transparent;
         &:focus {
-            border-top: panel cornflowerblue;
+            border-title-color: $text;
+            background: $boost;
         }
     }
 
@@ -292,33 +300,22 @@ class EvolveWordsApp(App[None]):
     }
 
     SizeCounts, PlotextPlot {
-        border-top: panel cornflowerblue 70%;
-        background: $panel;
+        border-top: panel $border;
+        color: $text-primary;
     }
 
     DataTable {
-        background: $panel;
-        border: solid cornflowerblue;
-        color: $accent-lighten-2;
+        border: solid $border;
         height: 1fr;
+        background: transparent;
 
         &> .datatable--header {
-            color: $accent-lighten-2;
+            color: $text-secondary;
         }
     }
 
     PlotextPlot {
         width: 3fr;
-    }
-
-    Log {
-        border-top: panel cornflowerblue 70%;
-        height: 1fr;
-        background: $panel;
-
-        &:focus {
-            border-top: panel cornflowerblue;
-        }
     }
     """
 
