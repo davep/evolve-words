@@ -268,7 +268,6 @@ class EvolveWordsApp(App[None]):
     TITLE = "Evolve Words"
 
     CSS = """
-
     Screen {
         background: $panel;
     }
@@ -286,12 +285,13 @@ class EvolveWordsApp(App[None]):
         content-align: left middle;
     }
 
-    VerticalScroll {
-        border-top: panel cornflowerblue 70%;
+    VerticalScroll, Log {
+        border-top: panel $border;
         height: 1fr;
-
+        background: transparent;
         &:focus {
-            border-top: panel cornflowerblue;
+            border-title-color: $text;
+            background: $boost;
         }
     }
 
@@ -300,32 +300,22 @@ class EvolveWordsApp(App[None]):
     }
 
     SizeCounts, PlotextPlot {
-        border-top: panel cornflowerblue 70%;
+        border-top: panel $border;
+        color: $text-primary;
     }
 
     DataTable {
-        border: solid cornflowerblue;
-        color: $accent-lighten-2;
+        border: solid $border;
         height: 1fr;
         background: transparent;
 
         &> .datatable--header {
-            color: $accent-lighten-2;
+            color: $text-secondary;
         }
     }
 
     PlotextPlot {
         width: 3fr;
-    }
-
-    Log {
-        border-top: panel cornflowerblue 70%;
-        height: 1fr;
-        background: transparent;
-
-        &:focus {
-            border-top: panel cornflowerblue;
-        }
     }
     """
 
